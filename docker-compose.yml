@@ -1,0 +1,12 @@
+---
+#web:
+#  build: .
+#  links:
+#    - database:postgres
+database:
+  image: postgres:9.4
+  environment:
+    POSTGRES_USER: exactonline
+    POSTGRES_PASSWORD: asdfasdfasdf
+  ports:
+    - 5432:5432

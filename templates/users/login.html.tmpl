@@ -1,0 +1,17 @@
+{{define "content"}}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6 col-md-4 col-md-offset-4">
+      <div class="account-wall well">
+        <h1 class="text-center">Recras &ndash; Exact Online koppeling</h1>
+
+        <form class="form-signup-login form-login" method="post" action="/login">
+          <input name="Email" type="email" class="form-control" placeholder="gebruikersnaam@demo.recras.nl" required autofocus>
+          <input name="Password" type="password" class="form-control" placeholder="recras wachtwoord" required>
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
