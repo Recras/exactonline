@@ -22,6 +22,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	_ "github.com/mattes/migrate/driver/postgres"
 	"github.com/mattes/migrate/migrate"
 	"github.com/tylerb/graceful"
 )
@@ -33,13 +34,13 @@ func init() {
 
 // NewApplication is the constructor for Application struct.
 func NewApplication() (*Application, error) {
-	db_user := libenv.EnvWithDefault("POSTGRES_ENV_POSTGRES_USERNAME", "exactonline")
+	db_user := libenv.EnvWithDefault("POSTGRES_ENV_POSTGRES_USER", "exactonline")
 	db_pass := libenv.EnvWithDefault("POSTGRES_ENV_POSTGRES_PASSWORD", "")
-	db_host := libenv.EnvWithDefault("POSTGRES_PORT_5432_ADDR", "localhost")
-	db_port := libenv.EnvWithDefault("POSTGRES_PORT_5432_PORT", "5432")
+	db_host := libenv.EnvWithDefault("POSTGRES_PORT_5432_TCP_ADDR", "localhost")
+	db_port := libenv.EnvWithDefault("POSTGRES_PORT_5432_TCP_PORT", "5432")
 
 	if db_user == "" || db_pass == "" {
-		return nil, errors.New("Be sure to set POSTGRES_ENV_POSTGRES_USERNAME and POSTGRES_ENV_POSTGRES_PASSWORD environment variables")
+		return nil, errors.New("Be sure to set POSTGRES_ENV_POSTGRES_USER and POSTGRES_ENV_POSTGRES_PASSWORD environment variables")
 	}
 	exact_client_secret := libenv.EnvWithDefault("EXACT_CLIENT_SECRET", "")
 	if exact_client_secret == "" {

@@ -1,12 +1,17 @@
 ---
-#web:
-#  build: .
-#  links:
-#    - database:postgres
-database:
-  image: postgres:9.4
+exactonline:
+  build: ./
+  ports:
+    - "80:8888"
+  links:
+    - postgres
+  environment:
+    EXACT_CLIENT_SECRET:
+    EXACT_CLIENT_ID:
+
+postgres:
+  image: postgres:9.5
+  detach: true
   environment:
     POSTGRES_USER: exactonline
     POSTGRES_PASSWORD: asdfasdfasdf
-  ports:
-    - 5432:5432
