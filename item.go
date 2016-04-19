@@ -142,3 +142,42 @@ func (i *Item) Save(c *Client) error {
 
 	return nil
 }
+
+const itemGroupURI = "/api/v1/%d/logistics/ItemGroups"
+
+type ItemGroup struct {
+	ID   string
+	Code string
+}
+type itemgroups struct {
+	D struct {
+		Results []ItemGroup `json:"results"`
+	} `json:"d"`
+}
+
+var ErrNoDefaultItemGroup = errors.New("No default ItemGroup")
+
+func (c *Client) FindDefaultItemGroup() (ItemGroup, error) {
+	u := fmt.Sprintf(itemGroupURI, c.Division)
+	filt := url.Values{}
+	filt.Set("$filter", "IsDefault eq 1")
+	resp, err := c.Client.Get(fmt.Sprintf("%s?%s", u, filt.Encode()))
+	if err != nil {
+		return ItemGroup{}, err
+	}
+	if resp.StatusCode != 200 {
+		return ItemGroup{}, httperror.New(resp)
+	}
+
+	out := &itemgroups{}
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(out)
+	if err != nil {
+		return ItemGroup{}, err
+	}
+
+	if len(out.D.Results) == 0 {
+		return ItemGroup{}, ErrNoDefaultItemGroup
+	}
+	return out.D.Results[0], nil
+}
