@@ -28,7 +28,7 @@ func TestNewClient(t *testing.T) {
 	defer ts.Close()
 
 	u, _ := url.Parse(ts.URL)
-	cl := NewClient(u.Host, "user", "password")
+	cl := NewClient("http://"+u.Host, "user", "password")
 	if _, err := cl.Client.Get(ts.URL); err != nil {
 		t.Errorf("Expected no error, got %#v", err)
 	}

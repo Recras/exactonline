@@ -68,7 +68,10 @@ type Client struct {
 }
 
 func NewClient(hostname, username, password string) Client {
-	b, _ := url.Parse("https://" + hostname)
+	if hostname[0:7] != "http://" {
+		hostname = "https://" + hostname
+	}
+	b, _ := url.Parse(hostname)
 	return Client{http.Client{Transport: &Transport{
 		BasicAuth: basicAuth{Username: username, Password: password},
 		BaseURL:   b,
