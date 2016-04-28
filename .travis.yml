@@ -1,6 +1,16 @@
 ---
+sudo: required
+
+services:
+  - docker
+
 language: go
 go:
   - 1.5
   - 1.6
   - tip
+
+install: []
+
+script:
+  - go test . ./recras ./odata2json ./synctool
