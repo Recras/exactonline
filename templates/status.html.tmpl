@@ -14,8 +14,11 @@
 		{{range .Administrations}}
 			<div class="alert {{if .EverythingOK}}alert-success{{else}}alert-warning{{end}}">
 				{{.RecrasBedrijfNaam}}
-				{{ if .Error }} &mdash; Wordt niet gesynchroniseerd: {{ .Error }}{{ end }}
-				</div>
+				{{ if .Error }}
+					&mdash; Wordt niet gesynchroniseerd: {{ .Error }}
+				{{ end }}
+			</div>
+			{{ if not .Error }}
 				<div class="row">
 					<div class="col-md-4" class="defaultItemGroup">
 						<ul>
@@ -32,11 +35,27 @@
 							<li>Omschrijving: {{ .DefaultJournalDesc }}</li>
 						</ul>
 					</div>
+
+					<div class="col-md-4" class="vatCodes">
+						<ul>
+							<li>
+								<strong>BTW-codes</strong>:
+								{{ if .VATCodesOK }}
+									OK
+								{{ end }}
+							</li>
+							{{ range $key, $ok := .VATCodes }}
+								<li>
+									<code>{{ $key }}</code>:
+									{{ if $ok }}
+										OK
+									{{ end }}
+								</li>
+							{{ end }}
+						</ul>
+					</div>
 				</div>
-		{{else}}
-			<div class="alert alert-danger" role="alert">
-				Geen bedrijven in Recras gevonden!
-			</div>
+			{{end}}
 		{{end}}
 	</div>
 {{end}}

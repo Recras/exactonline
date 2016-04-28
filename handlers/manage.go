@@ -29,6 +29,9 @@ type administrationData struct {
 
 	DefaultJournalOK   bool
 	DefaultJournalDesc string
+
+	VATCodesOK bool
+	VATCodes   map[string]bool
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -101,6 +104,13 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, data)
 		return
 	}
+
+	var btw_percentages struct {
+		Waarde string `json:"waarde"`
+	}
+	rcl.Get("/api2/instellingen/btw_percentages", &btw_percentages)
+	percentages := strings.Split(btw_percentages.Waarde, ",")
+
 	for _, b := range bedrijven {
 		data.Administrations = append(data.Administrations, administrationData{
 			RecrasBedrijfNaam: b.Bedrijfsnaam,
@@ -122,21 +132,48 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 		adminStatus.DefaultItemGroupOK = (err == nil)
 		adminStatus.DefaultItemGroupCode = itemgroup.Code
 
-		checkDagboek(cl, adminStatus, bedrijflogger)
+		checkDefaultJournal(cl, adminStatus, bedrijflogger)
+		checkVATCodes(percentages, cl, adminStatus, bedrijflogger)
 
-		adminStatus.EverythingOK = adminStatus.DefaultItemGroupOK && adminStatus.DefaultJournalOK
+		adminStatus.EverythingOK = adminStatus.DefaultItemGroupOK && adminStatus.DefaultJournalOK && adminStatus.VATCodesOK
 	}
 
 	tmpl.Execute(w, data)
 }
 
-func checkDagboek(cl *exactonline.Client, ad *administrationData, logger *logrus.Entry) {
+func checkDefaultJournal(cl *exactonline.Client, ad *administrationData, logger *logrus.Entry) {
 	j, err := cl.FindDefaultJournal()
 	if err != nil && err != exactonline.ErrJournalNotFound {
 		logrus.Errorf("%#v", err)
 	}
 	ad.DefaultJournalOK = (err == nil)
 	ad.DefaultJournalDesc = j.Description
+}
+
+func checkVATCodes(percentages []string, cl *exactonline.Client, ad *administrationData, logger *logrus.Entry) {
+	logrus.Debugf("Percentages: %v", percentages)
+	codes, err := cl.GetRecrasVATCodes()
+	if err != nil {
+		logrus.Errorf("VATCodes: %#v", err)
+		return
+	}
+	for c := range codes {
+		logrus.Debugf("%#v", codes[c])
+	}
+	ad.VATCodes = make(map[string]bool)
+	ad.VATCodesOK = true
+	for _, p := range percentages {
+		code := "recras:" + p
+		ad.VATCodes[code] = false
+		for cidx := range codes {
+			if codes[cidx].Description == code {
+				ad.VATCodes[code] = true
+			}
+		}
+		if !ad.VATCodes[code] {
+			ad.VATCodesOK = false
+		}
+	}
 }
 
 func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
