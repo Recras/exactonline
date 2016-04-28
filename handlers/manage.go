@@ -32,6 +32,8 @@ type administrationData struct {
 
 	VATCodesOK bool
 	VATCodes   map[string]bool
+
+	PaymentConditionOK bool
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -134,8 +136,9 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 		checkDefaultJournal(cl, adminStatus, bedrijflogger)
 		checkVATCodes(percentages, cl, adminStatus, bedrijflogger)
+		checkPaymentCondition(cl, adminStatus, bedrijflogger)
 
-		adminStatus.EverythingOK = adminStatus.DefaultItemGroupOK && adminStatus.DefaultJournalOK && adminStatus.VATCodesOK
+		adminStatus.EverythingOK = adminStatus.DefaultItemGroupOK && adminStatus.DefaultJournalOK && adminStatus.VATCodesOK && adminStatus.PaymentConditionOK
 	}
 
 	tmpl.Execute(w, data)
@@ -151,14 +154,10 @@ func checkDefaultJournal(cl *exactonline.Client, ad *administrationData, logger 
 }
 
 func checkVATCodes(percentages []string, cl *exactonline.Client, ad *administrationData, logger *logrus.Entry) {
-	logrus.Debugf("Percentages: %v", percentages)
 	codes, err := cl.GetRecrasVATCodes()
 	if err != nil {
 		logrus.Errorf("VATCodes: %#v", err)
 		return
-	}
-	for c := range codes {
-		logrus.Debugf("%#v", codes[c])
 	}
 	ad.VATCodes = make(map[string]bool)
 	ad.VATCodesOK = true
@@ -174,6 +173,14 @@ func checkVATCodes(percentages []string, cl *exactonline.Client, ad *administrat
 			ad.VATCodesOK = false
 		}
 	}
+}
+
+func checkPaymentCondition(cl *exactonline.Client, ad *administrationData, logger *logrus.Entry) {
+	_, err := cl.FindPaymentConditionByDescription("recras")
+	if err != nil {
+		logrus.Errorf("PaymentCondition: %#v", err)
+	}
+	ad.PaymentConditionOK = (err == nil)
 }
 
 func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
