@@ -60,14 +60,18 @@ func TestSaveContactmoment(t *testing.T) {
 		}
 		m["id"] = 1337
 		enc := json.NewEncoder(w)
+		w.WriteHeader(201)
 		enc.Encode(m)
 	})
 	defer ts.Close()
 	c := newContactmoment()
 	c.ID = 0
-	c.Save(client)
+	err := c.Save(client)
 	if !apiCalled {
 		t.Errorf("Expected API to be called")
+	}
+	if err != nil {
+		t.Errorf("Expected no error, got %#v", err)
 	}
 	if c.ID != 1337 {
 		t.Errorf("Expected ID to be set")
