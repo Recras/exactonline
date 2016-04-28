@@ -11,8 +11,8 @@ go:
   - tip
 
 install:
-  - test "${TRAVIS_GO_VERSION}" = "1.5" && export GO15VENDOREXPERIMENT="1"
+  - test "${TRAVIS_GO_VERSION}" = "1.5" && export GO15VENDOREXPERIMENT="1" || true
 
 script:
   - go test . ./recras ./odata2json ./synctool
-  - test "${TRAVIS_GO_VERSION}" = "tip" && docker build .
+  - test "${TRAVIS_GO_VERSION}" = "tip" && docker build . || true
