@@ -8,6 +8,7 @@ exactonline:
   environment:
     EXACT_CLIENT_SECRET:
     EXACT_CLIENT_ID:
+    EXACT_REDIRECT_URL:
 
 postgres:
   image: postgres:9.5
