@@ -83,11 +83,32 @@ func TestSetDivisionCredentials(t *testing.T) {
 
 	err = cl.SetDivisionByVATNumber("NL123456789B01")
 	if err != nil {
-		t.Errorf("Expected no error, got %#v", err)
+		t.Errorf("expected no error, got %#v", err)
 	}
 	if cl.Division != 456 {
-		t.Errorf("Expected Division with code 456, got %#v", cl.Division)
+		t.Errorf("expected division with code 456, got %#v", cl.Division)
 	}
+}
+
+func TestSetDivisionPeriods(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if vn := r.URL.Query()["$filter"]; vn[0] != "VATNumber eq 'NL123456789B01'" {
+			t.Errorf("Expected $filter query parameter to to have stripped periods, got %#v", vn)
+		}
+
+		fmt.Fprintf(w, `{"d":{"results":[{"Code": 456, "HID": "789", "VATNumber": "NL123456789B01"}]}}`)
+	}))
+	defer ts.Close()
+
+	baseUrl = ts.URL
+
+	c := Config{}
+	cl := c.NewClient(oauth2.Token{
+		Expiry: time.Now().Add(1 * time.Second),
+	})
+	cl.Division = 1234
+
+	cl.SetDivisionByVATNumber("NL12.3456.789.B01")
 }
 
 func TestSetDivisionSystemDivisionsSingleResult(t *testing.T) {

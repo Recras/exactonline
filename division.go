@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/Recras/exactonline/httperror"
 )
@@ -87,6 +88,9 @@ func (c *Client) SetDivisionByVATNumber(vn string) error {
 	if c.Division == 0 {
 		return ErrNoDivision
 	}
+
+	vn = strings.Replace(vn, ".", "", -1)
+
 	div, err := c.findDivisionByVATNumber(vn, c.Division)
 	if err != nil && err != ErrDivisionNotFound {
 		return err
