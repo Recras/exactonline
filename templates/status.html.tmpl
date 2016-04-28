@@ -1,0 +1,42 @@
+{{define "content"}}
+	<div class="container">
+		<div class="row">
+			<div class="jumbotron">
+				<h1>Koppelingsstatus</h1>
+				<p>
+					Op deze pagina is de actuele status van Exact Online te zien.
+				</p>
+			</div>
+		</div>
+		{{if .GeneralError }}
+			<div class="alert alert-danger">{{ .GeneralError }}</div>
+		{{end}}
+		{{range .Administrations}}
+			<div class="alert {{if .EverythingOK}}alert-success{{else}}alert-warning{{end}}">
+				{{.RecrasBedrijfNaam}}
+				{{ if .Error }} &mdash; Wordt niet gesynchroniseerd: {{ .Error }}{{ end }}
+				</div>
+				<div class="row">
+					<div class="col-md-4" class="defaultItemGroup">
+						<ul>
+							<li><strong>Standaard Artikelgroep</strong></li>
+							<li>Status: {{if .DefaultItemGroupOK}}OK{{end}}</li>
+							<li>Code: {{.DefaultItemGroupCode}}</li>
+						</ul>
+					</div>
+
+					<div class="col-md-4" class="defaultJournal">
+						<ul>
+							<li><strong>Dagboek 'recras'</strong></li>
+							<li>Status: {{ if .DefaultJournalOK }}OK{{end}}</li>
+							<li>Omschrijving: {{ .DefaultJournalDesc }}</li>
+						</ul>
+					</div>
+				</div>
+		{{else}}
+			<div class="alert alert-danger" role="alert">
+				Geen bedrijven in Recras gevonden!
+			</div>
+		{{end}}
+	</div>
+{{end}}
