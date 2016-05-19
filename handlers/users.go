@@ -58,7 +58,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 
 	userInfo := strings.Split(email, "@")
 	user, recrasHostname := userInfo[0], userInfo[1]
-	if err := recras.IsValidUser(recrasHostname, user, password); err == recras.ErrInvalidCredentials {
+	if err := recras.IsValidUser(recrasHostname, user, password); err == recras.ErrInvalidCredentials || err == recras.ErrInvalidHostname {
 		libhttp.HandleErrorJson(w, err)
 		return
 	} else if err != nil {

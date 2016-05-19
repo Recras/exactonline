@@ -38,3 +38,21 @@ func TestIsValidUser_(t *testing.T) {
 		t.Errorf("Expected invalid credentials error, got %#v", err)
 	}
 }
+
+func TestIsValidHostname(t *testing.T) {
+	if isValidHostname("example.com") {
+		t.Errorf(`Expected isValidHostname("example.com") to be false`)
+	}
+
+	if !isValidHostname("test.recras.nl") {
+		t.Error(`Expected isValidHostname("test.recras.nl") to be true`)
+	}
+
+	if isValidHostname(".recras.nl") {
+		t.Error(`Expected isValidHostname(".recras.nl") to be false`)
+	}
+
+	if isValidHostname("short") {
+		t.Error(`Expected isValidHostname("short") to be false (and not panic)`)
+	}
+}
