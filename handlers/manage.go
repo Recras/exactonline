@@ -37,19 +37,19 @@ type administrationData struct {
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-	cookieStore := context.Get(r, "cookieStore").(*sessions.CookieStore)
+	data := struct {
+		dashboardData
+		Administrations []administrationData
+		GeneralError    string
+	}{}
+	data.Administrations = []administrationData{}
 
-	session, _ := cookieStore.Get(r, "exactonline-session")
-	u, ok := session.Values["user"].(*dal.UserRow)
-	if !ok {
+	if !data.setDashboardData(r) {
 		http.Redirect(w, r, "/logout", 302)
 		return
 	}
 
-	db := context.Get(r, "db").(*sqlx.DB)
-
-	parts := strings.Split(u.Email, "@")
-	recras_hostname := parts[1]
+	recras_hostname := data.Hostname
 
 	logger := logrus.WithFields(logrus.Fields{
 		"function":        "handlers.GetStatus",
@@ -63,27 +63,15 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct {
-		CurrentUser     *dal.UserRow
-		Administrations []administrationData
-		GeneralError    string
-	}{
-		CurrentUser:     u,
-		Administrations: []administrationData{},
-	}
-
-	cred, err := dal.FindCredentialByRecrasHostname(db, recras_hostname)
-	if err != nil {
-		logger.Infof("error retrieving credentials: %s", err)
-	}
-	if cred.ExactRefreshToken == nil {
-		logger.Error("no ExactRefreshToken")
+	if !data.KoppelingActief {
 		data.GeneralError = "Verbinding met Exact Online is nog niet gelegd"
 		w.WriteHeader(400)
 		tmpl.Execute(w, data)
 		return
 	}
 
+	db := context.Get(r, "db").(*sqlx.DB)
+	cred, err := dal.FindCredentialByRecrasHostname(db, recras_hostname)
 	tok := oauth2.Token{
 		RefreshToken: *cred.ExactRefreshToken,
 	}
@@ -236,7 +224,6 @@ func GetSync(w http.ResponseWriter, r *http.Request) {
 	db := context.Get(r, "db").(*sqlx.DB)
 
 	parts := strings.Split(u.Email, "@")
-	//recras_username := parts[0]
 	recras_hostname := parts[1]
 	entry := logrus.WithFields(logrus.Fields{
 		"recras_hostname": recras_hostname,
