@@ -188,3 +188,50 @@ func TestSaveItem(t *testing.T) {
 		t.Errorf("Expected ID to be %#v, got %#v", "guid", a.ID)
 	}
 }
+
+func TestFindDefaultItemGroup(t *testing.T) {
+	apicalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apicalled = true
+
+		if p := r.URL.Path; p != "/api/v1/123/logistics/ItemGroups" {
+			t.Errorf("Expect path to be `/api/v1/123/logistics/ItemGroups`, got `%s`", p)
+		}
+		fmt.Fprint(w, `{"d":{"results":[{"ID":"guid","Code":"recras12"}]}}`)
+	}))
+	defer ts.Close()
+
+	c := Config{BaseURL: ts.URL}
+	cl := c.NewClient(oauth2.Token{
+		Expiry: time.Now().Add(time.Second),
+	})
+	cl.Division = 123
+
+	itemgroup, err := cl.FindDefaultItemGroup()
+	if !apicalled {
+		t.Errorf("Expected API to be called")
+	}
+	if err != nil {
+		t.Errorf("Expected no error, got %#v", err)
+	}
+	if (itemgroup != ItemGroup{Code: "recras12", ID: "guid"}) {
+		t.Errorf("Expected the item, got %#v", itemgroup)
+	}
+}
+
+func TestFindDefaultItemGroup_NotFound(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `{"d":{"results":[]}}`)
+	}))
+	defer ts.Close()
+
+	c := Config{BaseURL: ts.URL}
+	cl := c.NewClient(oauth2.Token{
+		Expiry: time.Now().Add(1 * time.Second),
+	})
+	cl.Division = 123
+	_, err := cl.FindDefaultItemGroup()
+	if err != ErrNoDefaultItemGroup {
+		t.Errorf("Expected ErrNoDefaultItemGroup, got %#v", err)
+	}
+}
