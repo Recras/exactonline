@@ -12,7 +12,6 @@ exactonline:
 
 postgres:
   image: postgres:9.5
-  detach: true
   environment:
     POSTGRES_USER: exactonline
     POSTGRES_PASSWORD: asdfasdfasdf
