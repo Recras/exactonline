@@ -157,14 +157,9 @@ const beginMinute = 7
 
 func (app *Application) runTimedSync() {
 	nexttick := time.Now()
-	if nexttick.Hour() >= beginHour && nexttick.Minute() > beginMinute {
-		nexttick = nexttick.AddDate(0, 0, 1)
-	}
-	next3am := time.Date(nexttick.Year(), nexttick.Month(), nexttick.Day(), beginHour, beginMinute, 0, 0, nexttick.Location())
-	logrus.Debugf("now: %s, next tick: %s", time.Now(), next3am)
 
-	logrus.Debugf("Waiting for %s", next3am.Sub(time.Now()))
-	time.AfterFunc(next3am.Sub(time.Now()), func() {
+	logrus.Debugf("Waiting for %s", nexttick.Sub(time.Now()))
+	time.AfterFunc(nexttick.Sub(time.Now()), func() {
 		logrus.Debugf("Running sync")
 		ticker := time.Tick(24 * time.Hour)
 
