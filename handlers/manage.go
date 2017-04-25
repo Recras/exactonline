@@ -189,7 +189,7 @@ func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
 	messagebuf := bytes.NewBuffer(nil)
 	for e := range errc {
 		logrus.Infof(e.Error())
-		fmt.Fprintln(messagebuf, e.Error())
+		fmt.Fprintln(messagebuf, "%s", e.Error())
 	}
 	//fmt.Fprint(w, messagebuf.String())
 
