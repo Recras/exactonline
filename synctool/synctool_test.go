@@ -158,6 +158,27 @@ func Test_convertFactuurregel_ZeroItem(t *testing.T) {
 	if len(lines) != 0 {
 		t.Errorf("Expected no lines with kortingsfactor 0")
 	}
+
+	itemf := itemFinder{
+		ID:        "asdf",
+		Code:      "recras12",
+		GLRevenue: "",
+	}
+	lines, err = convertFactuurregels(&itemf, []recras.Factuurregel{
+		{
+			Type:               recras.FactuurregelItem,
+			ProductID:          12,
+			Kortingspercentage: 0,
+			Aantal:             1,
+			Bedrag:             0,
+		},
+	}, 1, exactonline.VATCodeList{})
+	if err != nil {
+		t.Errorf("Expected no error, got %#v", err)
+	}
+	if len(lines) != 0 {
+		t.Errorf("Expected no with empty Bedrag and no GLRevenue")
+	}
 }
 
 func Test_convertFactuurregel_noGLRevenue(t *testing.T) {
@@ -168,8 +189,11 @@ func Test_convertFactuurregel_noGLRevenue(t *testing.T) {
 	}
 	_, err := convertFactuurregels(&itemf, []recras.Factuurregel{
 		{
-			Type:      recras.FactuurregelItem,
-			ProductID: 12,
+			Type:               recras.FactuurregelItem,
+			ProductID:          12,
+			Kortingspercentage: 0,
+			Aantal:             1,
+			Bedrag:             10,
 		},
 	}, 1, exactonline.VATCodeList{})
 	if e, ok := err.(ErrNoGLRevenueAccount); !ok {

@@ -253,6 +253,10 @@ func convertFactuurregels(exact_itemfinder exactonline.ItemFinder, r []recras.Fa
 			if err != nil {
 				return nil, err
 			}
+			amountFC := float64(regel.Aantal) * regel.Bedrag * (100 - regel.Kortingspercentage) / 100 * reductionfactor
+			if math.Abs(amountFC) < 1e-3 {
+				return out, nil
+			}
 			if i.GLRevenue == "" {
 				return nil, ErrNoGLRevenueAccount{
 					ProductID: regel.ProductID,
@@ -263,15 +267,13 @@ func convertFactuurregels(exact_itemfinder exactonline.ItemFinder, r []recras.Fa
 				return nil, ErrNoVATCode{Percentage: regel.BTWPercentage}
 			}
 			line := exactonline.SalesEntryLine{
-				AmountFC:    float64(regel.Aantal) * regel.Bedrag * (100 - regel.Kortingspercentage) / 100 * reductionfactor,
+				AmountFC:    amountFC,
 				GLAccount:   i.GLRevenue,
 				Description: regel.Naam,
 				Quantity:    float64(regel.Aantal),
 				VATCode:     vc,
 			}
-			if math.Abs(line.AmountFC) > 1e-3 {
-				out = append(out, line)
-			}
+			out = append(out, line)
 		} else if regel.Type == recras.FactuurregelGroep {
 			lines, err := convertFactuurregels(exact_itemfinder, regel.Regels, reductionfactor*(100-regel.Kortingspercentage)/100, vatcodes)
 			if err != nil {
