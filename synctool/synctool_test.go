@@ -232,6 +232,31 @@ func Test_convertFactuurregel_MultipleItems(t *testing.T) {
 	if len(lines) != 2 {
 		t.Errorf("Expected # of SalesEntryLines to be 2, got %d", len(lines))
 	}
+
+	lines, err = convertFactuurregels(&default_itemfinder, []recras.Factuurregel{
+		{
+			Type:               recras.FactuurregelItem,
+			Kortingspercentage: 0,
+			Aantal:             2,
+			Bedrag:             0,
+			ProductID:          12,
+			Naam:               "Product12",
+			BTWPercentage:      21,
+		}, {
+			Type:               recras.FactuurregelItem,
+			Kortingspercentage: 0,
+			Aantal:             4,
+			Bedrag:             2,
+			ProductID:          4,
+			Naam:               "Product4",
+			BTWPercentage:      6,
+		}}, 1, vatcodes)
+	if err != nil {
+		t.Errorf("Expected no error when converting multiple item")
+	}
+	if len(lines) != 1 {
+		t.Errorf("Expected # of SalesEntryLines to be 1, got %d", len(lines))
+	}
 }
 
 func Test_convertFactuurregel_NegativeItem(t *testing.T) {

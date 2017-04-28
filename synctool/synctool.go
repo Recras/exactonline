@@ -255,7 +255,7 @@ func convertFactuurregels(exact_itemfinder exactonline.ItemFinder, r []recras.Fa
 			}
 			amountFC := float64(regel.Aantal) * regel.Bedrag * (100 - regel.Kortingspercentage) / 100 * reductionfactor
 			if math.Abs(amountFC) < 1e-3 {
-				return out, nil
+				continue
 			}
 			if i.GLRevenue == "" {
 				return nil, ErrNoGLRevenueAccount{
