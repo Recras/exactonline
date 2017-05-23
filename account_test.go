@@ -38,15 +38,12 @@ func TestFindAccountByRecrasID(t *testing.T) {
 }
 func TestFindAccountByRecrasID_NotFound(t *testing.T) {
 	findBySearchCodeCalled := false
-	findByCodeCalled := false
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if p := r.URL.Path; p != "/api/v1/123/crm/Accounts" {
 			t.Errorf("Expected path to be `/api/v1/123/logistics/Accounts`, got `%s`", p)
 		}
 		if f := r.URL.Query().Get("$filter"); f == "SearchCode eq 'K12'" {
 			findBySearchCodeCalled = true
-		} else if f == "Code eq '732727000000000012'" {
-			findByCodeCalled = true
 		}
 		fmt.Fprint(w, `{"d":{"results":[]}}`)
 	}))
@@ -61,52 +58,10 @@ func TestFindAccountByRecrasID_NotFound(t *testing.T) {
 	if !findBySearchCodeCalled {
 		t.Errorf("Expected Accounts API to be queried by SearchCode")
 	}
-	if !findByCodeCalled {
-		t.Errorf("Expected Accounts API to be queried by Code")
-	}
 	if err == nil {
 		t.Errorf("Expected error")
 	} else if _, ok := err.(ErrAccountNotFound); !ok {
 		t.Errorf("Expected ErrAccountNotFound, got %#v", err)
-	}
-}
-
-func TestFindAccountByRecrasID_FoundByOldId(t *testing.T) {
-	findBySearchCodeCalled := false
-	findByCodeCalled := false
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if p := r.URL.Path; p != "/api/v1/123/crm/Accounts" {
-			t.Errorf("Expected path to be `/api/v1/123/logistics/Accounts`, got `%s`", p)
-		}
-		if f := r.URL.Query().Get("$filter"); f == "SearchCode eq 'K12'" {
-			findBySearchCodeCalled = true
-			fmt.Fprintf(w, `{"d":{"results":[]}}`)
-			return
-		}
-		if f := r.URL.Query().Get("$filter"); f == "Code eq '732727000000000012'" {
-			findByCodeCalled = true
-			fmt.Fprintf(w, `{"d":{"results":[{"Code": "                12", "ID": "guid", "SearchCode": null}]}}`)
-		}
-	}))
-	defer ts.Close()
-
-	c := Config{BaseURL: ts.URL}
-	cl := c.NewClient(oauth2.Token{
-		Expiry: time.Now().Add(1 * time.Second),
-	})
-	cl.Division = 123
-	item, err := cl.FindAccountByRecrasID(12)
-	if !findBySearchCodeCalled {
-		t.Errorf("Expected Accounts API to be queried by SearchCode")
-	}
-	if !findByCodeCalled {
-		t.Errorf("Expected Accounts API to be queried by Code")
-	}
-	if err != nil {
-		t.Errorf("Expected no error, got %#v", err)
-	}
-	if (item != Account{Code: "                12", ID: "guid", SearchCode: ""}) {
-		t.Errorf("Expected the item, got %#v", item)
 	}
 }
 

@@ -69,9 +69,6 @@ func (c *Client) FindAccountByRecrasID(recrasID int) (Account, error) {
 		return Account{}, ErrNoDivision
 	}
 	a, err := c.findAccountByFilter(recrasID, fmt.Sprintf("SearchCode eq 'K%d'", recrasID))
-	if _, ok := err.(ErrAccountNotFound); ok {
-		a, err = c.findAccountByFilter(recrasID, fmt.Sprintf("Code eq '732727%012d'", recrasID))
-	}
 	return a, err
 }
 
