@@ -61,7 +61,7 @@ func (c *Client) GetFacturenFilter(f url.Values) ([]Factuur, error) {
 		f = url.Values{}
 	}
 	out := []Factuur{}
-	url := "/api2/facturen?" + f.Encode()
+	url := "/api2/facturen?regelsformat=exactonline&" + f.Encode()
 	err := c.Get(url, &out)
 	return out, err
 }
