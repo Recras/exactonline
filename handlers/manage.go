@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/Recras/exactonline"
 	"github.com/Recras/exactonline/dal"
@@ -191,18 +192,20 @@ func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
 		logrus.Infof(e.Error())
 		fmt.Fprintf(messagebuf, "%s<br>\n", e.Error())
 	}
-	//fmt.Fprint(w, messagebuf.String())
 
 	personeel, _ := rcl.GetCurrentPersoneel()
-
-	//fmt.Fprintf(w, "Personeel: %#v", personeel)
+	gebruiker, _ := rcl.GetGebruiker(personeel)
+	now := time.Now()
 
 	contactmoment := recras.Contactmoment{
-		ContactID:        personeel.ID,
-		ContactpersoonID: personeel.ContactpersoonID,
-		Onderwerp:        "Synchronisatierapport",
-		Bericht:          messagebuf.String(),
-		Soort:            "noot",
+		ContactID:               personeel.ID,
+		ContactpersoonID:        personeel.ContactpersoonID,
+		Onderwerp:               "Synchronisatierapport",
+		Bericht:                 messagebuf.String(),
+		Soort:                   "noot",
+		ContactOpnemen:          &now,
+		ContactOpnemenGroup:     gebruiker.GetFirstRolId(),
+		ContactOpnemenOpmerking: "Synchronisatierapport Exact Online",
 	}
 	err = contactmoment.Save(&rcl)
 	if err != nil {

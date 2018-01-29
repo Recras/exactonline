@@ -18,7 +18,9 @@ type Contactmoment struct {
 
 	Sticky bool `json:"sticky"`
 
-	ContactOpnemen *time.Time `json:"contact_opnemen"`
+	ContactOpnemen          *time.Time `json:"contact_opnemen"`
+	ContactOpnemenGroup     int        `json:"contact_opnemen_group"`
+	ContactOpnemenOpmerking string     `json:"contact_opnemen_opmerking"`
 }
 
 var (
