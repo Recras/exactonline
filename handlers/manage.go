@@ -195,7 +195,7 @@ func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
 
 	personeel, _ := rcl.GetCurrentPersoneel()
 	gebruiker, _ := rcl.GetGebruiker(personeel)
-	now := time.Now()
+	now := time.Now().Truncate(time.Hour)
 
 	contactmoment := recras.Contactmoment{
 		ContactID:               personeel.ID,
