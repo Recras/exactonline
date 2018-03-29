@@ -78,7 +78,7 @@ type ErrSalesEntryNotFound struct {
 }
 
 func (e ErrSalesEntryNotFound) Error() string {
-	return fmt.Sprintf("SalesEntry not found for FactuurNummer `%s` in Division %d", e.Division, e.FactuurNummer)
+	return fmt.Sprintf("SalesEntry not found for FactuurNummer `%#v` in Division %s", e.Division, e.FactuurNummer)
 }
 
 func (c *Client) FindSalesEntry(factuurnr string) (SalesEntry, error) {

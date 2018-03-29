@@ -35,7 +35,7 @@ type ErrAccountNotFound struct {
 }
 
 func (e ErrAccountNotFound) Error() string {
-	return fmt.Sprintf("Account not found for RecrasID `%s` in Division %d", e.Division, e.RecrasID)
+	return fmt.Sprintf("Account not found for RecrasID `%#v` in Division %d", e.Division, e.RecrasID)
 }
 
 func (c *Client) findAccountByFilter(recrasID int, filter string) (Account, error) {

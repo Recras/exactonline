@@ -331,11 +331,11 @@ func Test_convertFactuur_simple(t *testing.T) {
 		t.Errorf("Expected Description to be %#v, got %#v", "Recras factuur: "+factuur.FactuurNummer, se.Description)
 	}
 	if se.EntryDate.Time != factuur.Datum.Time {
-		t.Errorf("Expected EntryDate to be %#s, got %#s", factuur.Datum, se.EntryDate.Time)
+		t.Errorf("Expected EntryDate to be %s, got %s", factuur.Datum, se.EntryDate.Time)
 	}
 	betaaldatum := factuur.Datum.Time.AddDate(0, 0, factuur.Betaaltermijn)
 	if se.DueDate.Time != betaaldatum {
-		t.Errorf("Expected DueDate to be %#s, got %#s", betaaldatum, se.DueDate.Time)
+		t.Errorf("Expected DueDate to be %s, got %s", betaaldatum, se.DueDate.Time)
 	}
 	if se.Journal != "recras" {
 		t.Errorf("Expected Journal to be %#v, got %#v", "recras", se.Journal)
