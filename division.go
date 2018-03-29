@@ -29,6 +29,9 @@ func (c *Client) GetDefaultDivision() error {
 	if err != nil {
 		return err
 	}
+	if resp.StatusCode != 200 {
+		return httperror.New(resp)
+	}
 	defer resp.Body.Close()
 
 	out := &me{}
