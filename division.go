@@ -21,11 +21,9 @@ type me struct {
 	} `json:"d"`
 }
 
-var baseUrl = "https://start.exactonline.nl/"
-
 // GetDefaultDivision retrieves and sets the default division on Client c
 func (c *Client) GetDefaultDivision() error {
-	resp, err := c.Client.Get(baseUrl + "/api/v1/current/Me")
+	resp, err := c.Client.Get("/api/v1/current/Me")
 	if err != nil {
 		return err
 	}
@@ -64,7 +62,7 @@ var ErrDivisionNotFound = errors.New("exactonline/api: No division found by VAT 
 func (c *Client) findDivisionByVATNumber(vn string, divisionID int) (Division, error) {
 	vnq := url.QueryEscape("VATNumber eq '" + vn + "'")
 
-	resp, err := c.Client.Get(fmt.Sprintf("%s/api/v1/%d/hrm/Divisions?$filter=%s", baseUrl, divisionID, vnq))
+	resp, err := c.Client.Get(fmt.Sprintf("/api/v1/%d/hrm/Divisions?$filter=%s", divisionID, vnq))
 	if err != nil {
 		return Division{}, err
 	}
@@ -111,7 +109,7 @@ func (c *Client) SetDivisionByVATNumber(vn string) error {
 }
 
 func (c *Client) findSystemDivisionByVATNumber(vn string) (Division, error) {
-	resp, err := c.Client.Get(fmt.Sprintf("%s/api/v1/%d/system/Divisions", baseUrl, c.Division))
+	resp, err := c.Client.Get(fmt.Sprintf("/api/v1/%d/system/Divisions", c.Division))
 	if err != nil {
 		return Division{}, err
 	}
