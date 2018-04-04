@@ -23,9 +23,7 @@ func TestGetDefaultDivision(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	baseUrl = ts.URL
-
-	c := Config{}
+	c := Config{BaseURL: ts.URL}
 	cl := c.NewClient(oauth2.Token{Expiry: time.Now().Add(3 * time.Second)})
 	err := cl.GetDefaultDivision()
 	if err != nil {
@@ -61,9 +59,7 @@ func TestSetDivisionCredentials(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	baseUrl = ts.URL
-
-	c := Config{}
+	c := Config{BaseURL: ts.URL}
 	cl := c.NewClient(oauth2.Token{
 		AccessToken: "invalid",
 		Expiry:      time.Now().Add(3 * time.Second),
@@ -100,9 +96,7 @@ func TestSetDivisionPeriods(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	baseUrl = ts.URL
-
-	c := Config{}
+	c := Config{BaseURL: ts.URL}
 	cl := c.NewClient(oauth2.Token{
 		Expiry: time.Now().Add(1 * time.Second),
 	})
@@ -141,9 +135,7 @@ func TestSetDivisionSystemDivisionsSingleResult(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	baseUrl = ts.URL
-
-	c := Config{}
+	c := Config{BaseURL: ts.URL}
 	cl := c.NewClient(oauth2.Token{
 		AccessToken: "valid",
 		Expiry:      time.Now().Add(3 * time.Second),
