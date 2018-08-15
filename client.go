@@ -9,8 +9,9 @@ import (
 )
 
 type Client struct {
-	Client   http.Client
-	Division int
+	Client      http.Client
+	Division    int
+	TokenSource tokenSource
 }
 
 var ErrNoDivision = errors.New("exactonline/api: Client has no Division, use Client.GetDefaultDivision first")
@@ -24,6 +25,7 @@ func (c Config) NewClient(tok oauth2.Token) *Client {
 	_ = ts
 	b, _ := url.Parse(c.BaseURL)
 	return &Client{
+		TokenSource: ts,
 		Client: http.Client{
 			Transport: &oauth2.Transport{
 				Base:   &Transport{BaseURL: b},

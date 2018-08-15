@@ -176,7 +176,7 @@ func (app *Application) runTimedSync() {
 			}
 
 			for _, cred := range creds {
-				handlers.SyncRecras(&cred, entry.WithField("recras_hostname", cred.RecrasHostname))
+				handlers.SyncRecras(&cred, entry.WithField("recras_hostname", cred.RecrasHostname), app.db)
 			}
 		}
 

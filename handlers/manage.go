@@ -172,7 +172,7 @@ func checkPaymentCondition(cl *exactonline.Client, ad *administrationData, logge
 	ad.PaymentConditionOK = (err == nil)
 }
 
-func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
+func SyncRecras(cred *dal.Credential, entry *logrus.Entry, db *sqlx.DB) {
 	cl := exactonline.EnvConfig().NewClient(oauth2.Token{RefreshToken: *cred.ExactRefreshToken})
 	err := cl.GetDefaultDivision()
 	if err != nil {
@@ -211,6 +211,15 @@ func SyncRecras(cred *dal.Credential, entry *logrus.Entry) {
 	if err != nil {
 		entry.WithField("recras_personeel", personeel.Displaynaam).Error("error saving contactmoment: " + err.Error())
 	}
+
+	tok, err := cl.TokenSource.Token()
+	if err != nil {
+		entry.Errorf("SyncRecras: error getting token")
+	}
+	err = cred.UpdateToken(db, tok.AccessToken, tok.RefreshToken)
+	if err != nil {
+		entry.Errorf("SyncRecras: error updating token")
+	}
 	entry.Info("Synchronization done")
 }
 
@@ -237,5 +246,5 @@ func GetSync(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Inloggegevens Exact Online konden niet gevonden worden voor %s", recras_hostname)
 	}
 
-	SyncRecras(cred, entry)
+	SyncRecras(cred, entry, db)
 }
