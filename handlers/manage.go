@@ -172,7 +172,12 @@ func checkPaymentCondition(cl *exactonline.Client, ad *administrationData, logge
 	ad.PaymentConditionOK = (err == nil)
 }
 
+// SyncRecras performs the synchronisation of a single Recras instance
 func SyncRecras(cred *dal.Credential, entry *logrus.Entry, db *sqlx.DB) {
+	if cred.ExactRefreshToken == nil {
+		entry.Errorf("handlers.SyncRecras: no Exact Refresh Token, please run the activation again")
+		return
+	}
 	cl := exactonline.EnvConfig().NewClient(oauth2.Token{RefreshToken: *cred.ExactRefreshToken})
 	err := cl.GetDefaultDivision()
 	if err != nil {
