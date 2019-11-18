@@ -20,7 +20,7 @@ type paymentConditions struct {
 	} `json:"d"`
 }
 
-var ErrPaymentConditionNotFound = errors.New("PaymentCondition not Found")
+var ErrPaymentConditionNotFound = errors.New("PaymentCondition with description \"recras\" not found")
 
 const paymentConditionURI = "/api/v1/%d/cashflow/PaymentConditions"
 
