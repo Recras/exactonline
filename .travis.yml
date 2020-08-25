@@ -6,7 +6,7 @@ services:
 
 language: go
 go:
-  - "1.10"
+  - "1.15"
   - master
 
 matrix:
@@ -15,4 +15,4 @@ matrix:
 
 script:
   - go test . ./recras ./odata2json ./synctool
-  - test "${TRAVIS_GO_VERSION}" = "1.10" && docker build . || true
+  - test "${TRAVIS_GO_VERSION}" = "1.15" && docker build . || true
