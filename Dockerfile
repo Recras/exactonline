@@ -1,4 +1,4 @@
-FROM golang:1.10
+FROM golang:1.15
 
 # Add project directory to Docker image.
 ADD . /go/src/github.com/Recras/exactonline
