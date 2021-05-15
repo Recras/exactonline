@@ -11,7 +11,7 @@ exactonline:
     EXACT_REDIRECT_URL:
 
 postgres:
-  image: postgres:9.5
+  image: postgres:13.3
   environment:
     POSTGRES_USER: exactonline
     POSTGRES_PASSWORD: asdfasdfasdf
